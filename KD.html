@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+    xmlns:th="http://www.thymeleaf.org" 
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head lang="en">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>KD</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    
+    <script type="text/javascript">
+        var rulecount = 0;
+        $(document).ready(function(){
+            rulecount = 0;
+            $("#plimg").hide();
+        });
+        
+        function onListSelect(){
+            $("#removerole").removeAttr("disabled");
+        }
+
+        function submitAjax(){
+            if(document.getElementById('moneytype').value=='-1')
+            {
+                alert('請選擇貨幣');
+            }
+            else if(document.getElementById('startCash').value=='')
+            {
+                alert('請輸入本金');
+            }
+            else if(document.getElementById('commis').value=='')
+            {
+                alert('請輸入手續費');
+            }
+            else if(document.getElementById('upboundType').value=='-1')
+            {
+                alert('請選擇上限數字');
+            }
+            else if(document.getElementById('downBoundType').value=='-1')
+            {
+                alert('請選擇下限數字');
+            }
+            $("#adata").hide();
+            var url = "http://d3a6-34-121-128-48.ngrok.io";
+            var item = {"coin": $("#moneytype option:selected").val(),
+                    "time": parseInt($("#datetype option:selected").val()),
+                    "upBound": parseInt($("#upboundType option:selected").val()),
+                    "downBound": parseInt($("#downBoundType option:selected").val()),
+                    "starting_cash": parseInt($('input[name=startCash]').val()),
+                    "commission": parseFloat($('input[name=commis]').val()),     
+                    
+            };
+            $("#plimg").hide();
+            $(".container2").show();
+            alert("開始計算");
+            $.ajax({
+                url: url+"/getKD",
+                type: "POST",
+                data: JSON.stringify(item),
+                headers: "",
+                dataType: 'json',
+                contentType:'application/json; charset=utf-8',
+                success: function (data) {
+                    //alert("第一階段成功");
+                    $(".container2").hide();
+                    //JSON.stringify(data, null, 4) ;
+                    
+                    $("#adata").show();
+                    $("#st_date").text(data.st_date);
+                    $("#end_date").text(data.end_date);
+                    $("#startValue").text(data.startValue);
+                    $("#finalValue").text(data.finalValue);
+                    $("#diffValue").text(data.diffValue);
+                    $("#plimg").show();
+                    //alert("第二階段成功");
+                    //$("#plimg").attr("src",url);
+                    $.ajax({
+                    url: url+"/KDpic",
+                    type: "GET",
+                    success: function (data) {
+                        $("#plimg").attr("src","data:image/png;base64, "+data);
+                        //alert("第三階段成功");
+                    }
+                    });
+                },
+                error: function(){
+                    alert("失敗");
+                }
+            });
+        }
+        
+        function submitKDcrossAjax(){
+            if(document.getElementById('moneytype').value=='-1')
+            {
+                alert('請選擇貨幣');
+            }
+            else if(document.getElementById('startCash').value=='')
+            {
+                alert('請輸入本金');
+            }
+            else if(document.getElementById('commis').value=='')
+            {
+                alert('請輸入手續費');
+            }
+            $("#adata").hide();
+            var url = "http://d3a6-34-121-128-48.ngrok.io";
+            var item = {"coin": $("#moneytype option:selected").val(),
+                    "time": parseInt($("#datetype option:selected").val()),
+                    "starting_cash": parseInt($('input[name=startCash]').val()),
+                    "commission": parseFloat($('input[name=commis]').val()),     
+                    
+            };
+            $("#plimg").hide();
+            $(".container2").show();
+            alert("開始計算");
+            $.ajax({
+                url: url+"/getKDcross",
+                type: "POST",
+                data: JSON.stringify(item),
+                headers: "",
+                dataType: 'json',
+                contentType:'application/json; charset=utf-8',
+                success: function (data) {
+                    //alert("第一階段成功");
+                    $(".container2").hide();
+                    //JSON.stringify(data, null, 4) ;
+                    
+                    $("#adata").show();
+                    $("#st_date").text(data.st_date);
+                    $("#end_date").text(data.end_date);
+                    $("#startValue").text(data.startValue);
+                    $("#finalValue").text(data.finalValue);
+                    $("#diffValue").text(data.diffValue);
+                    $("#plimg").show();
+                    //alert("第二階段成功");
+                    //$("#plimg").attr("src",url);
+                    $.ajax({
+                    url: url+"/KDcrossPic",
+                    type: "GET",
+                    success: function (data) {
+                        $("#plimg").attr("src","data:image/png;base64, "+data);
+                        //alert("第三階段成功");
+                    }
+                    });
+                },
+                error: function(){
+                    alert("失敗");
+                }
+            });
+        }
+    </script>
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+      #content {
+            margin: 0px auto;
+            width: 40em;
+            margin-top: 4em;
+        }
+
+        .card-body form {
+            margin-left: 2em;
+        }
+
+        #rolecollapse {
+            margin-bottom: 1em;
+        }
+
+        #addrole {
+            margin-bottom: 1em;
+        }
+
+        #removerole {
+            margin-top: 1em;
+        }
+
+        #when_form {
+            margin-left: 0.6em;
+        }
+        .container2 {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+                -ms-flex-align: center;
+                    align-items: center;
+            -webkit-box-pack: center;
+                -ms-flex-pack: center;
+                    justify-content: center;
+            min-height: 10vh;
+        }
+
+        .loader {
+        max-width: 15rem;
+        width: 100%;
+        height: auto;
+        stroke-linecap: round;
+        }
+
+        circle {
+        fill: none;
+        stroke-width: 3.5;
+        -webkit-animation-name: preloader;
+                animation-name: preloader;
+        -webkit-animation-duration: 3s;
+                animation-duration: 3s;
+        -webkit-animation-iteration-count: infinite;
+                animation-iteration-count: infinite;
+        -webkit-animation-timing-function: ease-in-out;
+                animation-timing-function: ease-in-out;
+        -webkit-transform-origin: 170px 170px;
+                transform-origin: 170px 170px;
+        will-change: transform;
+        }
+        circle:nth-of-type(1) {
+        stroke-dasharray: 550;
+        }
+        circle:nth-of-type(2) {
+        stroke-dasharray: 500;
+        }
+        circle:nth-of-type(3) {
+        stroke-dasharray: 450;
+        }
+        circle:nth-of-type(4) {
+        stroke-dasharray: 300;
+        }
+        circle:nth-of-type(1) {
+        -webkit-animation-delay: -0.15s;
+                animation-delay: -0.15s;
+        }
+        circle:nth-of-type(2) {
+        -webkit-animation-delay: -0.3s;
+                animation-delay: -0.3s;
+        }
+        circle:nth-of-type(3) {
+        -webkit-animation-delay: -0.45s;
+        -moz-animation-delay:  -0.45s;
+                animation-delay: -0.45s;
+        }
+        circle:nth-of-type(4) {
+        -webkit-animation-delay: -0.6s;
+        -moz-animation-delay: -0.6s;
+                animation-delay: -0.6s;
+        }
+
+        @-webkit-keyframes preloader {
+        50% {
+            -webkit-transform: rotate(360deg);
+                    transform: rotate(360deg);
+        }
+        }
+
+        @keyframes preloader {
+        50% {
+            -webkit-transform: rotate(360deg);
+                    transform: rotate(360deg);
+        }
+        }
+        #big{
+        width: 60rem;
+        /*height: 40rem;*/
+        position: absolute;
+        margin: 5rem 0 0 -15rem;
+        }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="dashboard.css" rel="stylesheet" />
+  </head>
+  <body >
+          
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+    <nav class="navbar navbar-dark fixed-top  flex-md-nowrap p-0 shadow" style="background-color:cadetblue">
+        <span class="navbar-brand col-sm-3 col-md-2 mr-0" href="#" style="font-size:large;">虛擬貨幣回測工具</span>
+        
+    </nav>
+
+    <div class="container-fluid" style="margin-bottom: 2rem;">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="index.html">
+                  <span data-feather="home"></span>
+                  Home <span class="sr-only"></span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="Rsi.html">
+                  <span data-feather="file"></span>
+                  RSI
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="KD.html">
+                  <span data-feather="file"></span>
+                  KD
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+          <div
+            class="
+              d-flex
+              justify-content-between
+              flex-wrap flex-md-nowrap
+              align-items-center
+              pt-3           
+              mb-3
+              border-bottom
+            "
+          >
+            <div>
+                <h1 class="h2">KD策略</h1>
+                <p>(以週期9天為基準)</p>
+            </div>
+                
+          </div>
+          <div class="card" id="content">
+            <h5 class="card-header" style="background-color:cornflowerblue"><font color="white">Setting</font></h5>
+    
+            <div class="card-body ">
+                <div class="form-group row">
+                    <label for="moneytype" class="col-sm-3 col-form-label col-form-label-lg">貨幣</label>
+                    <div class="col-sm-8">
+                        <select name="moneytype" id="moneytype" class="form-control">
+                            <option value="-1" selected>Choose...</option>
+                            <option value="BTC">比特幣(BTCUSDT)</option>
+                            <option value="ETH">乙太幣(ETHUSDT)</option>
+                            <option value="BNB">幣安幣(BNBUSDT)</option>
+                            <option value="DOGE">狗狗幣(DOGEUSDT)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="datetype" class="col-sm-3 col-form-label col-form-label-lg">時間長度</label>
+                    <div class="col-sm-8">
+                        <select name="datetype" id="datetype" class="form-control">
+                            <option value="-1" selected>Choose...</option>
+                            <option value="3">3個月</option>
+                            <option value="6">6個月</option>
+                            <option value="12">1年</option>
+                            <option value="24">2年</option>
+                            <option value="0">All</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="form-group row">
+                    <label  class="col-sm-3 col-form-label col-form-label-lg">本金</label>
+                    <div class="col-sm-8">
+                        <input
+                        type="number"
+                        class="form-control"
+                        id="startCash"
+                        name="startCash"
+                        placeholder="Input money"
+                        required
+                        />
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label col-form-label-lg">手續費</label>
+                    <div class="col-sm-8">
+                        <input
+                        type="number"
+                        class="form-control"
+                        id="commis"
+                        name="commis"
+                        placeholder="Input Fee"
+                        required
+                        />
+                    </div>
+                </div>
+
+                <p>
+                    <center>
+                        <a class="btn btn-secondary btn-outline-dark" data-toggle="collapse" href="#rolecollapse"
+                        role="button" aria-expanded="false" aria-controls="collapseExample">KD值上下限選擇</a>
+                        <button type="button" data-toggle="modal"
+                            data-target="#ajaxModalCenter" onclick="submitKDcrossAjax()"  class="btn btn-primary"  value="submit">直接使用黃金交叉策略(Submit)</button>
+                    </center>
+                </p>
+                <div class="collapse" id="rolecollapse">
+                    <div class="alert alert-danger alert-dismissible fade show" hidden>
+                        <strong>Error!</strong> 新增失敗
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    </div>
+                    <div class="card card-body">
+                        <div class="form-group row">
+                            <label for="upboundType" class="col-sm-3 col-form-label col-form-label-lg">上限數字</label>
+                            <div class="col-sm-8">
+                                <select name="upboundType" id="upboundType" class="form-control">
+                                    <option value="-1" selected>Choose...</option>
+                                    <option value="90">上限90</option>                             
+                                    <option value="80">上限80</option>
+                                    <option value="70">上限70</option>
+                                    <option value="60">上限60</option>
+                                </select>
+                            </div>
+                        </div>
+    
+                        <div class="form-group row">
+                            <label for="downBoundType" class="col-sm-3 col-form-label col-form-label-lg">下限數字</label>
+                            <div class="col-sm-8">
+                                <select name="downBoundType" id="downBoundType" class="form-control">
+                                    <option value="-1" selected>Choose...</option>
+                                    <option value="40">下限40</option>                             
+                                    <option value="30">下限30</option>
+                                    <option value="20">下限20</option>
+                                    <option value="10">下限10</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <center><button type="button" data-toggle="modal"
+                            data-target="#ajaxModalCenter" onclick="submitAjax()"  class="btn btn-primary"  value="submit">Submit</button>
+                        </center>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Response Modal -->
+        <div class="modal fade" id="ajaxModalCenter" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-fullscreen" role="document" >
+                <div class="modal-content" id="big">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Result</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="adata">
+                            <div class="row pr-3">
+                                <p class="col-6 col-sm-4">Start Time: <span id="st_date"></span></p>
+                                <p class="col-6 col-sm-4">Final Time: <span id="end_date"></span></p>  
+                            </div>
+                            <div class="row pr-3">
+                                <p class="col-6 col-sm-4">Start Value: <span id="startValue"></span></p>
+                                <p class="col-6 col-sm-4">Final Value: <span id="finalValue"></span></p>  
+                            </div>
+                            <p>Total winnings/losses: <span id="diffValue"></span></p> 
+                        </div>
+                        <div class="container2">
+        
+                            <svg class="loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 340">
+                                 <circle cx="170" cy="170" r="160" stroke="#E2007C"/>
+                                 <circle cx="170" cy="170" r="135" stroke="#404041"/>
+                                 <circle cx="170" cy="170" r="110" stroke="#E2007C"/>
+                                 <circle cx="170" cy="170" r="85" stroke="#404041"/>
+                            </svg>
+                            
+                        </div>
+                        
+                        <img id="plimg" src="/" width="100%" height="100%" style="margin:auto;"></img>
+                        
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+      </div>
+    </div>
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.9.0/feather.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
+  <footer class="bg-dark text-center text-white container-fluid" style="position: absolute; z-index: 100;">
+    <div class="container p-2">
+
+    
+        <p>
+        提醒: 並沒有任何一項技術指標能夠百分之百準確，所有技術指標都有可能出現雜訊或誤判，因此運用上，應該避免以單一指標作為所有交易的進出依據，
+        而應視標的特性不同選取適合的指標，並嘗試將不同指標相互搭配使用，以降低誤判機率，進而增加投資的成功率。
+        技術指標是用來幫助我們描述過去(只有今天的價格是最新的，其他都是用舊的價格一起算出來的)，而非直接能預測未來。
+        此工具僅做學術方面使用。
+        </p>
+    
+    </div>
+
+    <div class="text-center p-2" style="background-color: rgba(0, 0, 0, 0.2);">
+    © 2021 Copyright
+    
+    </div>
+
+  </footer>
+</html>
